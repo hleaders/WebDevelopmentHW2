@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US Population</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 30%;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<h2>US Population</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Year</th>
+            <th>Population</th>
+        </tr>
+    </thead>
+    <tbody id="populationData">
+        
+    </tbody>
+</table>
+
+<script>
+    fetch('https://datausa.io/api/data?drilldowns=Nation&measures=Population')
+        .then(response => response.json())
+        .then(data => {
+            data.data.sort((a, b) => a.Year - b.Year);
+            
+            const populationData = document.getElementById('populationData');
+            data.data.forEach(node => {
+                const year = node.Year;
+                const population = node.Population.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); //Regex borrowed from https://stackoverflow.com/questions/2901102/how-to-format-a-number-with-commas-as-thousands-separators
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${year}</td>
+                    <td>${population}</td>
+                `;
+                populationData.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+</script>
+
+</body>
+</html>
